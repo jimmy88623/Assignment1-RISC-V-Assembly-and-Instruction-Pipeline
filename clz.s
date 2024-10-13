@@ -1,37 +1,54 @@
+.data
+input: .word 0xf2133212 ,0x1c45f455,0x05151515
+output: .word 0x00000000,0x00000003,0x00000005
+yes_msg: .string "True \n"
+no_msg: .string "False \n"
+.text
 main:
-    li a0, 0x0100f219   # load input data
-    jal ra, my_clz      # send my_clz function
-    li a7, 10              
+    la t0, input
+    la t1, output
+    li t2, 3
+compare_loop:
+    lw a0, 0(t0)
+    lw a1, 0(t1)
+    jal ra, my_clz
+    beq a0, a1, print_yes
+    j print_no
+    
+print_yes:
+    la a0, yes_msg
+    li a7, 4
+    ecall 
+    j next_compare
+print_no:  
+    la a0, no_msg
+    li a7, 4
+    ecall 
+    j next_compare
+next_compare:
+    addi t0, t0, 4
+    addi t1, t1, 4
+    addi t2, t2, -1
+    bnez t2, compare_loop
+    li a7, 10
     ecall
     
 # Function to count leading zeros (CLZ)
 my_clz:
-    addi sp, sp, -16    # create stack
-    sw ra, 12(sp)       # store ra
-    sw s0, 8(sp)        # store s0
-    sw s1, 4(sp)        # store s1
-    sw s2, 0(sp)        # store s2
-
-
-    li s0, 31           # s0 = i
-    li s1, 0            # s1 = count
+    li t3, 31           # s0 = i
+    li t4, 0            # s1 = count
 
 loop:
-    li s2, 0x1          # load 0x1
-    sll s2, s2, s0      # shift left 
-    and s2, a0, s2      # do "and" operation, take the left bit
-    bne s2, x0, done    
+    li t5, 0x1          # load 0x1
+    sll t5, t5, t3      # shift left 
+    and t5, a0, t5      # do "and" operation, take the left bit
+    bne t5, x0, done    
 
-    addi s1, s1, 1      # update count
-    addi s0, s0, -1     # update i
+    addi t4, t4, 1      # update count
+    addi t3, t3, -1     # update i
 
-    bge s0, x0, loop    # loop condition 
+    bge t3, x0, loop    # loop condition 
 
 done:
-    mv a0, s1           # put the answer into a0
-    lw ra, 12(sp)       # load ra
-    lw s0, 8(sp)        # load s0
-    lw s1, 4(sp)        # load s1
-    lw s2, 0(sp)        # load s2  
-    addi sp, sp, 16     # release stack
+    mv a0, t4           # put the answer into a0
     ret                 # return

@@ -4,8 +4,8 @@ msg_true: .string "True \n"
 msg_false: .string "False \n"
 .text
 main:
-    la      s10, arr               # Load address of array into a0 (first argument to function)
-    li      a1, 3                # Load array size (6 in this case) into a1 (second argument)
+    la      s10, arr              # Load address of array into a0 (first argument to function)
+    li      a1, 3                 # Load array size (6 in this case) into a1 (second argument)
     call    threeConsecutiveOdds  # Call the function
     
     # Check the returned result and print appropriate message
@@ -16,7 +16,7 @@ print_true:
     li a0,1
     la      a0, msg_true          # Load address of "True" message into a0
     li      a7, 4                 # Syscall for print string
-    ecall                        # Make the system call
+    ecall                         # Make the system call
     li      a7, 10                # Syscall for exit
     ecall            # End the program after printing
 
@@ -35,10 +35,10 @@ threeConsecutiveOdds:
     li      s2, 3                # Load 3 into s2 (for checking consecutive count)
     
 loop_start:
-    bge     s9, a1, print_false # if i >= arrSize, return false
+    bge     s9, a1, print_false  # if i >= arrSize, return false
     
     slli    s3, s9, 2            # Calculate offset for arr[i] (s3 = i * 4)
-    add     s3, s10, s3           # Load address of arr[i] into s3
+    add     s3, s10, s3          # Load address of arr[i] into s3
     lw      s4, 0(s3)            # Load arr[i] into s4
     
     slli    s5, s4, 31           # Shift value left by 31 bits
@@ -46,7 +46,7 @@ loop_start:
     
     mv      a0,s5
     li      s7, 0x1f  
-    jal ra, my_clz        # Use clz to count leading zeros in s5 
+    jal ra, my_clz               # Use clz to count leading zeros in s5 
     beq a0, s7, increment_count  # If leading zeros == 31, increment count
     j reset_count
 reset_count:
@@ -56,7 +56,7 @@ reset_count:
     
 increment_count:
     addi    s8, s8, 1            # count++
-    beq     s8, s2, print_true  # If count == 3, return true
+    beq     s8, s2, print_true   # If count == 3, return true
     addi    s9, s9, 1            # i++
     j       loop_start           # Jump to start of the loop
     
